@@ -1,6 +1,8 @@
 #Import Libraries
 library(plyr)
 library(lme4)
+library(RColorBrewer)
+
 
 # Import your data from .csv file
 File_Name=file.choose()
@@ -131,16 +133,18 @@ Summary.total=ddply(Corrected_Data.Dose, c("Genotype","Time"), summarise,
 l[[a]]=Summary.total$mean
 Summary.total$BLUP=BLUP.l[[a]]$BLUP
 Summary.total=Summary.total[order(Summary.total$mean),]
-Summary.total$rc=rev(grey((Summary.total$mean/max(Summary.total$mean))))
+Color=colorRampPalette(c("steelblue","orangered"))
+Summary.total$rc <-  Color(length(Summary.total$Genotype))
+#Summary.total$rc=rev(grey((Summary.total$mean/max(Summary.total$mean))))
 
 par(mar=c(5,4,2,1),mgp=c(2.2,.5,0),mfrow=c(1,1))
 pdf(file=paste("Range of DGRP Response at",a,"Imidacloprid.pdf"),width=10)
-bp=barplot(Summary.total$mean,col=Summary.total$rc,ylim=c(0,.05+max(Summary.total$mean+Summary.total$ci)),axes=F,family="serif",ylab=list("RMR Value",cex=1.5,font=2),main=a,cex.main=2)
-segments(bp,Summary.total$mean-Summary.total$ci, bp,Summary.total$mean+Summary.total$ci,col="red",lwd=2)
-segments(x0=bp-.3, y0=Summary.total$mean+Summary.total$ci,x1=bp+.3,lwd=2,col="red")
+bp=barplot(Summary.total$mean,col=Summary.total$rc,ylim=c(0,.05+max(Summary.total$mean+Summary.total$ci)),border=TRUE,axes=F,family="serif",ylab=list("RMR Value",cex=1.5,font=2),main=a,cex.main=2)
+segments(bp,Summary.total$mean-Summary.total$ci, bp,Summary.total$mean+Summary.total$ci,col="black",lwd=2)
+segments(x0=bp-.3, y0=Summary.total$mean+Summary.total$ci,x1=bp+.3,lwd=2,col="black")
 axis(side=2,at=c(0,.2,.4,.6,.8,1.0),family="serif",font=2,las=1,tick=T)
 mtext("DGRP Genotype",side=1,cex=1.5,font=2,family="serif",line=1)
-grid(nx=NA,ny=NULL)
+#grid(nx=NA,ny=NULL)
 par(new=T)
 bp=barplot(Summary.total$mean,col=Summary.total$rc,ylim=c(0,.05+max(Summary.total$mean+Summary.total$ci)),axes=F,family="serif")
 dev.off()
